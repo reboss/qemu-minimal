@@ -33,4 +33,6 @@ qemu-vms/vms/testvm/user-data: qemu-vms/vms/testvm
 	@echo "      - $$(cat ~/.ssh/id_rsa.pub 2>/dev/null || cat ~/.ssh/id_ed25519.pub)" >> $@
 	@echo "ssh_pwauth: false" >> $@
 	@echo "disable_root: true" >> $@
-	@echo "disable_root: true" >> $@
+
+qemu-vms/vms/testvm/meta-data: qemu-vms/vms/testvm
+	@printf "instance-id: testvm\nlocal-hostname: testvm\n" > $@
