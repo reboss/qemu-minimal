@@ -10,10 +10,7 @@ qemu-vms/images/noble-amd64.img: | qemu-vms/images
 	wget -O $@ https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
 
 qemu-vms/vms/testvm/testvm.qcow2: qemu-vms/images/noble-amd64.img | qemu-vms/vms/testvm
-	qemu-img create -f qcow2 \
-	  -F qcow2 \
-	  -b $< \
-	  $@ 40G
+	cd $(@D) && qemu-img create -f qcow2 -F qcow2 -b ../../images/$(notdir $<) $(@F) 40G
 
 verify-qemu: qemu-vms/vms/testvm/testvm.qcow2
 	qemu-img info $^
