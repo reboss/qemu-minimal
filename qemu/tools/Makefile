@@ -36,3 +36,18 @@ qemu-vms/vms/testvm/user-data: qemu-vms/vms/testvm
 
 qemu-vms/vms/testvm/meta-data: qemu-vms/vms/testvm
 	@printf "instance-id: testvm\nlocal-hostname: testvm\n" > $@
+
+qemu-vms/vms/testvm/seed.qcow2: qemu-vms/vms/testvm/user-data qemu-vms/vms/testvm/meta-data
+	cloud-localds -d qcow2 $@ qemu-vms/vms/testvm/user-data qemu-vms/vms/testvm/meta-data
+
+run-testvm: qemu-vms/vms/testvm/testvm.qcow2 qemu-vms/vms/testvm/seed.qcow2
+	qemu-system-x86_64 \
+	  -machine q35,accel=kvm \
+	  -cpu host \
+	  -smp 4 \
+	  -m 4096 \
+	  -nographic \
+	  -drive if=virtio,format=qcow2,file=qemu-vms/vms/testvm/testvm.qcow2 \
+	  -drive if=virtio,format=qcow2,file=qemu-vms/vms/testvm/seed.qcow2 \
+	  -netdev user,id=net0,hostfwd=tcp::2222-:22 \
+	  -device virtio-net-pci,netdev=net0
