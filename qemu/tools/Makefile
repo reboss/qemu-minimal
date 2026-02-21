@@ -20,4 +20,8 @@ verify-qemu: qemu-vms/vms/testvm/testvm.qcow2
 	qemu-img info $^
 
 driver-check:
-	./amd-gpu-health-check.sh	
+	./amd-gpu-health-check.sh
+
+replace-ssh-key:
+	PUBKEY="$(cat ~/.ssh/id_rsa.pub 2>/dev/null || cat ~/.ssh/id_ed25519.pub)"
+	perl -0777 -i -pe "s|REPLACE_ME|$ENV{PUBKEY}|g" qemu-vms/vms/testvm/user-data
