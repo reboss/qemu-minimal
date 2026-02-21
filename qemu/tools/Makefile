@@ -1,5 +1,4 @@
-
-.PHONY: driver-check verify-qemu
+.PHONY: driver-check verify-qemu run-testvm clean
 
 qemu-vms/images:
 	@mkdir -p $@
@@ -7,10 +6,10 @@ qemu-vms/images:
 qemu-vms/vms/testvm:
 	@mkdir -p $@
 
-qemu-vms/images/noble-amd64.img: qemu-vms/images
+qemu-vms/images/noble-amd64.img: | qemu-vms/images
 	wget -O $@ https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
 
-qemu-vms/vms/testvm/testvm.qcow2: qemu-vms/vms/testvm
+qemu-vms/vms/testvm/testvm.qcow2: | qemu-vms/vms/testvm
 	qemu-img create -f qcow2 \
 	  -F qcow2 \
 	  -b ../../images/noble-amd64.img \
@@ -22,7 +21,7 @@ verify-qemu: qemu-vms/vms/testvm/testvm.qcow2
 driver-check:
 	./amd-gpu-health-check.sh
 
-qemu-vms/vms/testvm/user-data: qemu-vms/vms/testvm
+qemu-vms/vms/testvm/user-data: | qemu-vms/vms/testvm
 	@echo "#cloud-config" > $@
 	@echo "users:" >> $@
 	@echo "  - name: ubuntu" >> $@
@@ -34,7 +33,7 @@ qemu-vms/vms/testvm/user-data: qemu-vms/vms/testvm
 	@echo "ssh_pwauth: false" >> $@
 	@echo "disable_root: true" >> $@
 
-qemu-vms/vms/testvm/meta-data: qemu-vms/vms/testvm
+qemu-vms/vms/testvm/meta-data: | qemu-vms/vms/testvm
 	@printf "instance-id: testvm\nlocal-hostname: testvm\n" > $@
 
 qemu-vms/vms/testvm/seed.qcow2: qemu-vms/vms/testvm/user-data qemu-vms/vms/testvm/meta-data
@@ -47,7 +46,11 @@ run-testvm: qemu-vms/vms/testvm/testvm.qcow2 qemu-vms/vms/testvm/seed.qcow2
 	  -smp 4 \
 	  -m 4096 \
 	  -nographic \
-	  -drive if=virtio,format=qcow2,file=qemu-vms/vms/testvm/testvm.qcow2 \
-	  -drive if=virtio,format=qcow2,file=qemu-vms/vms/testvm/seed.qcow2 \
+	  -drive file=qemu-vms/vms/testvm/testvm.qcow2,if=virtio,format=qcow2 \
+	  -drive file=qemu-vms/vms/testvm/seed.qcow2,if=virtio,format=qcow2 \
+	  -boot order=c \
 	  -netdev user,id=net0,hostfwd=tcp::2222-:22 \
 	  -device virtio-net-pci,netdev=net0
+
+clean:
+	rm -rf qemu-vms
