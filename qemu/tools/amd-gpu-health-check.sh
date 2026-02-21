@@ -13,3 +13,8 @@ for d in /sys/bus/pci/devices/*; do
   drv="$(basename "$(readlink "$d/driver" 2>/dev/null)" 2>/dev/null || echo none)"
   echo "$bdf driver=$drv"
 done
+
+lsmod | grep -E '^amdgpu\b' || echo "amdgpu module not loaded"
+ls -l /dev/dri 2>/dev/null || echo "/dev/dri not present"
+
+rocm-smi -i
