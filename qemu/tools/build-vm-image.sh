@@ -6,7 +6,7 @@ wget -O noble-amd64.img \
 
 popd
 
-cd ./qemu-vms/vms/testvm
+pushd ./qemu-vms/vms/testvm
 
 qemu-img create -f qcow2 \
   -F qcow2 \
@@ -14,3 +14,5 @@ qemu-img create -f qcow2 \
   testvm.qcow2 40G
 
 qemu-img info testvm.qcow2
+
+popd
