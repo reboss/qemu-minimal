@@ -22,14 +22,15 @@ verify-qemu: qemu-vms/vms/testvm/testvm.qcow2
 driver-check:
 	./amd-gpu-health-check.sh
 
-generate-user-data: qemu-vms/vms/testvm
-	@echo "#cloud-config" > $</user-data
-	@echo "users:" >> $</user-data
-	@echo "  - name: ubuntu" >> $</user-data
-	@echo "    sudo: ALL=(ALL) NOPASSWD:ALL" >> $</user-data
-	@echo "    groups: users, admin" >> $</user-data
-	@echo "    shell: /bin/bash" >> $</user-data
-	@echo "    ssh_authorized_keys:" >> $</user-data
-	@echo "      - $$(cat ~/.ssh/id_rsa.pub 2>/dev/null || cat ~/.ssh/id_ed25519.pub)" >> $</user-data
-	@echo "ssh_pwauth: false" >> $</user-data
-	@echo "disable_root: true" >> $</user-data
+qemu-vms/vms/testvm/user-data: qemu-vms/vms/testvm
+	@echo "#cloud-config" > $@
+	@echo "users:" >> $@
+	@echo "  - name: ubuntu" >> $@
+	@echo "    sudo: ALL=(ALL) NOPASSWD:ALL" >> $@
+	@echo "    groups: users, admin" >> $@
+	@echo "    shell: /bin/bash" >> $@
+	@echo "    ssh_authorized_keys:" >> $@
+	@echo "      - $$(cat ~/.ssh/id_rsa.pub 2>/dev/null || cat ~/.ssh/id_ed25519.pub)" >> $@
+	@echo "ssh_pwauth: false" >> $@
+	@echo "disable_root: true" >> $@
+	@echo "disable_root: true" >> $@
