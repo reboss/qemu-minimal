@@ -1,4 +1,6 @@
 
+.PHONY: driver-check verify-qemu
+
 qemu-vms/images:
 	mkdir -p $@
 
@@ -14,5 +16,8 @@ qemu-vms/vms/testvm/testvm.qcow2: qemu-vms/vms/testvm
 	  -b ../../images/noble-amd64.img \
 	  $@ 40G
 
-verify: qemu-vms/vms/testvm/testvm.qcow2
+verify-qemu: qemu-vms/vms/testvm/testvm.qcow2
 	qemu-img info $^
+
+driver-check:
+	./amd-gpu-health-check.sh	
