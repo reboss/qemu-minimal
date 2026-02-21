@@ -9,10 +9,10 @@ qemu-vms/vms/testvm:
 qemu-vms/images/noble-amd64.img: | qemu-vms/images
 	wget -O $@ https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
 
-qemu-vms/vms/testvm/testvm.qcow2: | qemu-vms/vms/testvm
+qemu-vms/vms/testvm/testvm.qcow2: qemu-vms/images/noble-amd64.img | qemu-vms/vms/testvm
 	qemu-img create -f qcow2 \
 	  -F qcow2 \
-	  -b ../../images/noble-amd64.img \
+	  -b $< \
 	  $@ 40G
 
 verify-qemu: qemu-vms/vms/testvm/testvm.qcow2
@@ -40,7 +40,7 @@ qemu-vms/vms/testvm/seed.qcow2: qemu-vms/vms/testvm/user-data qemu-vms/vms/testv
 	cloud-localds -d qcow2 $@ qemu-vms/vms/testvm/user-data qemu-vms/vms/testvm/meta-data
 
 run-testvm: qemu-vms/vms/testvm/testvm.qcow2 qemu-vms/vms/testvm/seed.qcow2
-	qemu-system-x86_64 \
+	sudo qemu-system-x86_64 \
 	  -machine q35,accel=kvm \
 	  -cpu host \
 	  -smp 4 \
